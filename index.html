@@ -1822,6 +1822,21 @@ function importarCopia() {
     input.click();
 }
 
+// Esperar a que el HTML cargue por completo
+document.addEventListener("DOMContentLoaded", function() {
+	let inputFav = document.getElementById('input-fav-versiculo');
+	
+	if (inputFav) {
+		inputFav.addEventListener('keydown', function(evento) {
+			// Comprobar si la tecla presionada es Enter
+			if (evento.key === 'Enter') {
+				evento.preventDefault(); // Evita que la página intente recargarse o enviar un formulario
+				agregarVersiculoFavorito(); // Llama a tu función que guarda el pasaje
+			}
+		});
+	}
+});
+
 document.addEventListener("DOMContentLoaded", () => setTimeout(window.verificarYActualizarLogros, 300));
 window.onload = cargarProgreso;
 </script>
