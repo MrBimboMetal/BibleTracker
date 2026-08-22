@@ -43,9 +43,22 @@ body {
     height: fit-content; position: static;
 }
 .history-title { font-size: 1.1rem; font-weight: bold; color: var(--primary); margin-top: 0; margin-bottom: 15px; border-bottom: 2px solid var(--primary); padding-bottom: 5px; }
-.session-block { background-color: var(--primary-light); border-left: 4px solid var(--accent); padding: 14px; border-radius: 6px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+.session-block {
+    background-color: var(--primary-light);
+    border-left: 4px solid var(--accent);
+    padding: 0px 14px;               /* ← reducido */
+    border-radius: 6px;
+    margin-bottom: 10px;             /* ← un poco menos espacio */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    transition: padding 0.2s ease;
+}
 .session-block.flagged { border-left-color: #f1c40f !important; box-shadow: 0 0 10px rgba(241,196,15,0.25); background-color: var(--card-bg); border: 1px solid #f1c40f; border-left: 5px solid #f1c40f; }
-.session-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.session-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0;                /* sin margen cuando está cerrado */
+}
 .session-date { font-weight: bold; color: var(--text-color); font-size: 0.9rem; }
 .session-text-details { font-size: 0.82rem; line-height: 1.4; margin-bottom: 8px; }
 .text-detail-line { margin: 3px 0; }
@@ -159,6 +172,25 @@ body {
 #buscador-global {
     padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color);
     background: var(--card-bg); color: var(--text-color); width: 220px; font-size: 0.85rem;
+}
+.session-details {
+    display: none;
+    margin-top: 8px;
+}
+.session-block.open {
+    padding: 14px;                   /* vuelve al padding normal cuando está abierto */
+}
+.session-block.open .session-details {
+    display: block;
+}
+.session-toggle {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 8px;
 }
 @keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
 @keyframes slideInUp { 0% { transform: translateY(50px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
@@ -919,7 +951,18 @@ function recalcularBloquesHistorial() {
                 let div = document.createElement('div');
                 div.className = 'session-block'+(flag?' flagged':'');
                 div.id = 'block-div-'+idL;
-                div.innerHTML = '<div class="session-header"><div class="session-date">⏱️ Día '+fecha.split('/')[0]+'</div><button class="flag-btn" onclick="toggleFlagBloque(\''+fecha+'\')">🚩</button></div><div class="session-text-details">'+det+'</div><textarea class="sidebar-notes-box" id="notas-fecha-'+idL+'" rows="3" placeholder="Anotaciones..." oninput="guardarNotasBloque(\''+fecha+'\')">'+nota+'</textarea>';
+                div.innerHTML = 
+					'<div class="session-header" style="cursor:pointer;" onclick="this.parentElement.classList.toggle(\'open\')">' +
+						'<div style="display:flex; align-items:center; gap:6px;">' +
+							'<div class="session-date">⏱️ Día ' + fecha.split('/')[0] + '</div>' +
+							'<span class="session-toggle">▼</span>' +
+						'</div>' +
+						'<button class="flag-btn" onclick="event.stopPropagation(); toggleFlagBloque(\'' + fecha + '\')">🚩</button>' +
+					'</div>' +
+					'<div class="session-details">' +
+						'<div class="session-text-details">' + det + '</div>' +
+						'<textarea class="sidebar-notes-box" id="notas-fecha-' + idL + '" rows="3" placeholder="Anotaciones..." oninput="guardarNotasBloque(\'' + fecha + '\')">' + nota + '</textarea>' +
+					'</div>';
                 cont.appendChild(div);
                 if (flag) {
                     let res = [];
