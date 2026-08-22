@@ -954,7 +954,7 @@ function recalcularBloquesHistorial() {
                 div.innerHTML = 
 					'<div class="session-header" style="cursor:pointer;" onclick="this.parentElement.classList.toggle(\'open\')">' +
 						'<div style="display:flex; align-items:center; gap:6px;">' +
-							'<div class="session-date">⏱️ Día ' + fecha.split('/')[0] + '</div>' +
+							'<div class="session-date">' + fecha.split('/')[0] + '</div>' +
 							'<span class="session-toggle">▼</span>' +
 						'</div>' +
 						'<button class="flag-btn" onclick="event.stopPropagation(); toggleFlagBloque(\'' + fecha + '\')">🚩</button>' +
