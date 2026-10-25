@@ -1094,21 +1094,36 @@ function generarMiniCalendario(fechasEstudio) {
         }
     });
     if (!anos.size) {
-        cont.innerHTML = '<div style="color:#7f8c8d; font-size:0.85rem; font-style:italic; text-align:center; padding:12px 0;">El mapa se activará con tu primera lectura.</div>';
-		setTimeout(() => {
-		    const diasEstudiados = cont.querySelectorAll('div[title*="(Estudiado)"]');
-		    if (diasEstudiados.length > 0) {
-		        const ultimo = diasEstudiados[diasEstudiados.length - 1];
-		        const contenedorScroll = ultimo.closest('div[style*="overflow-x:auto"]');
-		        if (contenedorScroll) {
-		            const rect = ultimo.getBoundingClientRect();
-		            const contRect = contenedorScroll.getBoundingClientRect();
-		            contenedorScroll.scrollLeft = ultimo.offsetLeft - (contenedorScroll.clientWidth / 2) + (ultimo.offsetWidth / 2);
-		        }
-		    }
-		}, 50);
-        return;
-    }
+	    cont.innerHTML = html;
+	
+	    // Posicionar el calendario en el último día de estudio
+	    setTimeout(() => {
+	        // Buscar todos los días estudiados
+	        const diasEstudiados = cont.querySelectorAll('div[title*="(Estudiado)"]');
+	        if (diasEstudiados.length === 0) return;
+	
+	        const ultimoDia = diasEstudiados[diasEstudiados.length - 1];
+	
+	        // Buscar el contenedor con scroll horizontal más cercano
+	        let scrollContainer = ultimoDia.parentElement;
+	        while (scrollContainer && scrollContainer !== cont) {
+	            const style = window.getComputedStyle(scrollContainer);
+	            if (style.overflowX === 'auto' || style.overflowX === 'scroll') {
+	                break;
+	            }
+	            scrollContainer = scrollContainer.parentElement;
+	        }
+	
+	        if (scrollContainer && scrollContainer !== cont) {
+	            // Centrar el último día en el contenedor
+	            const containerWidth = scrollContainer.clientWidth;
+	            const diaLeft = ultimoDia.offsetLeft;
+	            const diaWidth = ultimoDia.offsetWidth;
+	
+	            scrollContainer.scrollLeft = diaLeft - (containerWidth / 2) + (diaWidth / 2);
+	        }
+	    }, 100);
+	}
     let listaAnos = [...anos].sort((a,b)=>a-b);
     const nMes = ["E","F","M","A","M","J","J","A","S","O","N","D"];
     const nMesL = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
