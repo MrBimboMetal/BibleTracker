@@ -946,7 +946,7 @@ function recalcularBloquesHistorial() {
             let idMes = 'mes-' + año + '-' + mesIdx;
             let btn = document.createElement('button');
             btn.style.cssText = "background:none; border:none; width:100%; text-align:left; padding:6px 8px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; color:#3498db; font-size:0.92rem; font-weight:bold; margin:4px 0; border-radius:4px;";
-            btn.innerHTML = '<div style="display:flex; align-items:center; gap:6px;"><span class="indicador-flecha" style="font-size:0.7rem; width:10px;">▼</span><span>📅 ' + meses[mesIdx] + '</span></div><span style="font-size:0.72rem; background:#3498db; color:white; padding:1px 7px; border-radius:10px;">' + lista.length + (lista.length===1?' día':' días') + '</span>';
+            btn.innerHTML = '<div style="display:flex; align-items:center; gap:6px;"><span class="indicador-flecha" style="font-size:0.7rem; width:10px;">▶</span><span>📅 ' + meses[mesIdx] + '</span></div><span style="font-size:0.72rem; background:#3498db; color:white; padding:1px 7px; border-radius:10px;">' + lista.length + (lista.length===1?' día':' días') + '</span>';
             btn.onclick = function() {
                 let t = document.getElementById(idMes);
                 let ind = this.querySelector('.indicador-flecha');
@@ -954,10 +954,10 @@ function recalcularBloquesHistorial() {
                 else { t.style.display = 'none'; if(ind) ind.innerText='▶'; }
             };
             panel.appendChild(btn);
-            let cont = document.createElement('div');
-            cont.id = idMes;
-            cont.style.cssText = "margin-left:14px; border-left:1px dashed #2d3748; padding-left:10px; display:block;";
-            panel.appendChild(cont);
+			let cont = document.createElement('div');
+			cont.id = idMes;
+			cont.style.cssText = "margin-left:14px; border-left:1px dashed #2d3748; padding-left:10px; display:none;";
+			panel.appendChild(cont);
             lista.forEach(fecha => {
                 let idsR = mapeoRuta[fecha]||[], idsS = mapeoSalmos[fecha]||[], idsP = mapeoProv[fecha]||[], idsC = mapeoComp[fecha]||[];
                 let det = '';
@@ -1095,6 +1095,18 @@ function generarMiniCalendario(fechasEstudio) {
     });
     if (!anos.size) {
         cont.innerHTML = '<div style="color:#7f8c8d; font-size:0.85rem; font-style:italic; text-align:center; padding:12px 0;">El mapa se activará con tu primera lectura.</div>';
+		setTimeout(() => {
+		    const diasEstudiados = cont.querySelectorAll('div[title*="(Estudiado)"]');
+		    if (diasEstudiados.length > 0) {
+		        const ultimo = diasEstudiados[diasEstudiados.length - 1];
+		        const contenedorScroll = ultimo.closest('div[style*="overflow-x:auto"]');
+		        if (contenedorScroll) {
+		            const rect = ultimo.getBoundingClientRect();
+		            const contRect = contenedorScroll.getBoundingClientRect();
+		            contenedorScroll.scrollLeft = ultimo.offsetLeft - (contenedorScroll.clientWidth / 2) + (ultimo.offsetWidth / 2);
+		        }
+		    }
+		}, 50);
         return;
     }
     let listaAnos = [...anos].sort((a,b)=>a-b);
