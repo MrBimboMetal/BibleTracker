@@ -1096,33 +1096,16 @@ function generarMiniCalendario(fechasEstudio) {
     if (!anos.size) {
 	    cont.innerHTML = html;
 	
-	    // Posicionar el calendario en el último día de estudio
 	    setTimeout(() => {
-	        // Buscar todos los días estudiados
-	        const diasEstudiados = cont.querySelectorAll('div[title*="(Estudiado)"]');
-	        if (diasEstudiados.length === 0) return;
+	        const scrollContainers = cont.querySelectorAll('div[style*="overflow-x:auto"]');
+	        if (scrollContainers.length === 0) return;
 	
-	        const ultimoDia = diasEstudiados[diasEstudiados.length - 1];
-	
-	        // Buscar el contenedor con scroll horizontal más cercano
-	        let scrollContainer = ultimoDia.parentElement;
-	        while (scrollContainer && scrollContainer !== cont) {
-	            const style = window.getComputedStyle(scrollContainer);
-	            if (style.overflowX === 'auto' || style.overflowX === 'scroll') {
-	                break;
-	            }
-	            scrollContainer = scrollContainer.parentElement;
-	        }
-	
-	        if (scrollContainer && scrollContainer !== cont) {
-	            // Centrar el último día en el contenedor
-	            const containerWidth = scrollContainer.clientWidth;
-	            const diaLeft = ultimoDia.offsetLeft;
-	            const diaWidth = ultimoDia.offsetWidth;
-	
-	            scrollContainer.scrollLeft = diaLeft - (containerWidth / 2) + (diaWidth / 2);
-	        }
-	    }, 100);
+	        // Usar el último contenedor de scroll (el año más reciente)
+	        const ultimoContenedor = scrollContainers[scrollContainers.length - 1];
+	        
+	        // Scrollear casi hasta el final
+	        ultimoContenedor.scrollLeft = ultimoContenedor.scrollWidth - ultimoContenedor.clientWidth - 20;
+	    }, 150);
 	}
     let listaAnos = [...anos].sort((a,b)=>a-b);
     const nMes = ["E","F","M","A","M","J","J","A","S","O","N","D"];
