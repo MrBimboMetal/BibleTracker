@@ -1085,71 +1085,111 @@ function actualizarFechasFin() {
 function generarMiniCalendario(fechasEstudio) {
     let cont = document.getElementById('mini-calendario-box');
     if (!cont) return;
+
+    const isDark = document.body.getAttribute('data-theme') === 'dark';
+    const colorTextoNormal   = isDark ? 'rgba(255,255,255,0.22)' : '#2c3e50';
+    const colorTextoHoy      = isDark ? '#3498db' : '#d81b60';
+    const colorTextoEstudiado= isDark ? '#fff' : '#fff';
+    const colorLabel         = isDark ? 'rgba(255,255,255,0.7)' : '#4a1942';
+    const colorMes           = isDark ? 'rgba(255,255,255,0.85)' : '#4a1942';
+    const colorTituloAnio    = isDark ? '#fff' : '#4a1942';
+    const colorLeyenda       = isDark ? 'rgba(255,255,255,0.6)' : '#666';
+
     let set = new Set(), anos = new Set();
     fechasEstudio.forEach(f => {
         let p = f.split('/');
-        if (p.length===3) {
-            let d=parseInt(p[0]), m=parseInt(p[1]), a=parseInt(p[2]);
-            if (!isNaN(a)&&a>0) { set.add(d+'/'+m+'/'+a); anos.add(a); }
+        if (p.length === 3) {
+            let d = parseInt(p[0]), m = parseInt(p[1]), a = parseInt(p[2]);
+            if (!isNaN(a) && a > 0) {
+                set.add(d + '/' + m + '/' + a);
+                anos.add(a);
+            }
         }
     });
+
     if (!anos.size) {
-	    cont.innerHTML = html;
-	
-	    setTimeout(() => {
-	        const scrollContainers = cont.querySelectorAll('div[style*="overflow-x:auto"]');
-	        if (scrollContainers.length === 0) return;
-	
-	        // Usar el último contenedor de scroll (el año más reciente)
-	        const ultimoContenedor = scrollContainers[scrollContainers.length - 1];
-	        
-	        // Scrollear casi hasta el final
-	        ultimoContenedor.scrollLeft = ultimoContenedor.scrollWidth - ultimoContenedor.clientWidth - 20;
-	    }, 150);
-	}
-    let listaAnos = [...anos].sort((a,b)=>a-b);
-    const nMes = ["E","F","M","A","M","J","J","A","S","O","N","D"];
+        cont.innerHTML = '<div style="color:#7f8c8d; font-size:0.85rem; font-style:italic; text-align:center; padding:12px 0;">El mapa se activará con tu primera lectura.</div>';
+        return;
+    }
+
+    let listaAnos = [...anos].sort((a, b) => a - b);
+    const nMes  = ["E","F","M","A","M","J","J","A","S","O","N","D"];
     const nMesL = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
-    let hoy = new Date(), dH=hoy.getDate(), mH=hoy.getMonth(), aH=hoy.getFullYear();
+    let hoy = new Date(), dH = hoy.getDate(), mH = hoy.getMonth(), aH = hoy.getFullYear();
+
     let html = '';
+    let ultimoDiaId = null;
+
     listaAnos.forEach(ano => {
-        let prim = new Date(ano,0,1);
+        let prim = new Date(ano, 0, 1);
         let ds = prim.getDay();
-        let des = ds===0 ? 6 : ds-1;
+        let des = ds === 0 ? 6 : ds - 1;
         let colMes = Array(12).fill(0);
-        let fb = new Date(ano,0,1), acum = des;
-        while (fb.getFullYear()===ano) {
-            if (fb.getDate()===1) colMes[fb.getMonth()] = Math.floor(acum/7)+1;
-            acum++; fb.setDate(fb.getDate()+1);
+        let fb = new Date(ano, 0, 1), acum = des;
+
+        while (fb.getFullYear() === ano) {
+            if (fb.getDate() === 1) colMes[fb.getMonth()] = Math.floor(acum / 7) + 1;
+            acum++;
+            fb.setDate(fb.getDate() + 1);
         }
-        let totCol = Math.ceil(acum/7);
-        let filaM = '<div style="display:grid; grid-template-columns:repeat('+totCol+',15px); gap:4px; font-size:0.68rem; font-weight:bold; height:16px; margin-bottom:3px;">';
-        for (let c=1; c<=totCol; c++) {
+
+        let totCol = Math.ceil(acum / 7);
+        let filaM = `<div style="display:grid; grid-template-columns:repeat(${totCol},15px); gap:4px; font-size:0.68rem; font-weight:bold; height:16px; margin-bottom:3px; color:${colorMes};">`;
+        for (let c = 1; c <= totCol; c++) {
             let m = colMes.indexOf(c);
-            if (m!==-1) filaM += '<div style="grid-column:'+c+'; text-align:left;">'+nMes[m]+'</div>';
+            if (m !== -1) filaM += `<div style="grid-column:${c}; text-align:left;">${nMes[m]}</div>`;
         }
         filaM += '</div>';
-        html += '<div style="margin-bottom:18px; border-bottom:1px dashed rgba(255,255,255,0.05); padding-bottom:12px;">';
-        html += '<div style="font-size:0.9rem; font-weight:bold; margin-bottom:10px;">📊 Año '+ano+'</div>';
-        html += '<div style="display:flex; gap:7px;"><div style="display:grid; grid-template-rows:repeat(7,15px); gap:4px; font-size:0.6rem; font-weight:bold; text-align:right; padding-top:19px; width:12px;"><div>L</div><div></div><div>X</div><div></div><div>V</div><div></div><div>D</div></div>';
-        html += '<div style="overflow-x:auto; flex-grow:1;">'+filaM+'<div style="display:grid; grid-template-rows:repeat(7,15px); grid-auto-flow:column; grid-auto-columns:15px; gap:4px;">';
-        for (let i=0; i<des; i++) html += '<div style="width:15px; height:15px; background:transparent;"></div>';
-        let f = new Date(ano,0,1);
-        while (f.getFullYear()===ano) {
-            let dn=f.getDate(), mn=f.getMonth();
-            let key = dn+'/'+(mn+1)+'/'+ano;
-            let est = set.has(key);
-            let esHoy = (dn===dH && mn===mH && ano===aH);
-            let bg = est ? '#2ecc71' : (esHoy ? 'rgba(52,152,219,0.15)' : 'rgba(255,255,255,0.05)');
-            let bd = esHoy ? '1px solid #3498db' : 'none';
-            let col = est ? '#fff' : (esHoy ? '#3498db' : 'rgba(255,255,255,0.22)');
-            html += '<div title="'+dn+' de '+nMesL[mn]+' '+ano+(est?' (Estudiado)':'')+'" style="width:15px; height:15px; background:'+bg+'; border:'+bd+'; border-radius:2px; display:flex; align-items:center; justify-content:center; font-size:0.55rem; font-weight:bold; color:'+col+'; font-family:monospace;">'+dn+'</div>';
-            f.setDate(f.getDate()+1);
+
+        html += `<div style="margin-bottom:18px; border-bottom:1px dashed rgba(0,0,0,0.08); padding-bottom:12px;">`;
+        html += `<div style="font-size:0.9rem; font-weight:bold; margin-bottom:10px; color:${colorTituloAnio};">📊 Año ${ano}</div>`;
+        html += `<div style="display:flex; gap:7px;"><div style="display:grid; grid-template-rows:repeat(7,15px); gap:4px; font-size:0.6rem; font-weight:bold; text-align:right; padding-top:19px; width:12px; color:${colorLabel};"><div>L</div><div></div><div>X</div><div></div><div>V</div><div></div><div>D</div></div>`;
+        html += `<div class="cal-scroll-container" style="overflow-x:auto; flex-grow:1;">${filaM}<div style="display:grid; grid-template-rows:repeat(7,15px); grid-auto-flow:column; grid-auto-columns:15px; gap:4px;">`;
+
+        for (let i = 0; i < des; i++) {
+            html += `<div style="width:15px; height:15px; background:transparent;"></div>`;
         }
-        html += '</div></div></div></div>';
+
+        let f = new Date(ano, 0, 1);
+        while (f.getFullYear() === ano) {
+            let dn = f.getDate(), mn = f.getMonth();
+            let key = dn + '/' + (mn + 1) + '/' + ano;
+            let est = set.has(key);
+            let esHoy = (dn === dH && mn === mH && ano === aH);
+
+            let bg = est ? '#27ae60' : (esHoy ? 'rgba(216,27,96,0.15)' : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'));
+            let bd = est ? '1px solid #1e8449' : (esHoy ? '1px solid #2980b9' : 'none');
+            let col = est ? colorTextoEstudiado : (esHoy ? colorTextoHoy : colorTextoNormal);
+
+            let diaId = `cal-dia-${ano}-${mn+1}-${dn}`;
+            if (est) ultimoDiaId = diaId;
+
+            html += `<div id="${diaId}" title="${dn} de ${nMesL[mn]} ${ano}${est ? ' (Estudiado)' : ''}" style="width:15px; height:15px; background:${bg}; border:${bd}; border-radius:2px; display:flex; align-items:center; justify-content:center; font-size:0.55rem; font-weight:bold; color:${col}; font-family:monospace;">${dn}</div>`;
+            f.setDate(f.getDate() + 1);
+        }
+
+        html += `</div></div></div></div>`;
     });
-    html += '<div style="display:flex; justify-content:flex-end; align-items:center; gap:5px; font-size:0.68rem; margin-top:-2px;"><span>Menos</span><div style="width:11px; height:11px; background:rgba(255,255,255,0.05); border-radius:1px;"></div><div style="width:11px; height:11px; background:#2ecc71; border-radius:1px;"></div><span>Más</span></div>';
+
+    html += `<div style="display:flex; justify-content:flex-end; align-items:center; gap:5px; font-size:0.68rem; margin-top:-2px; color:${colorLeyenda};"><span>Menos</span><div style="width:11px; height:11px; background:${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'}; border-radius:1px;"></div><div style="width:11px; height:11px; background:#27ae60; border-radius:1px;"></div><span>Más</span></div>`;
+
     cont.innerHTML = html;
+
+    // Centrar en el último día de estudio
+    setTimeout(() => {
+        if (!ultimoDiaId) return;
+        const ultimoDia = document.getElementById(ultimoDiaId);
+        if (!ultimoDia) return;
+
+        const scrollContainer = ultimoDia.closest('.cal-scroll-container');
+        if (!scrollContainer) return;
+
+        const diaLeft = ultimoDia.offsetLeft;
+        const diaWidth = ultimoDia.offsetWidth || 15;
+        const containerWidth = scrollContainer.clientWidth;
+
+        scrollContainer.scrollLeft = Math.max(0, diaLeft - (containerWidth / 2) + (diaWidth / 2));
+    }, 80);
 }
 
 function actualizarProgreso() {
