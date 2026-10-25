@@ -1281,13 +1281,43 @@ function toggleTheme() {
 function agregarVersiculoFavorito() {
     let input = document.getElementById('input-fav-versiculo');
     if (!input || !input.value.trim()) return;
-    let favs = JSON.parse(localStorage.getItem('biblia_v4_fav_list')||"[]");
-    if (!favs.includes(input.value.trim())) {
-        favs.push(input.value.trim());
-        localStorage.setItem('biblia_v4_fav_list', JSON.stringify(favs));
-    }
+
+    let favs = JSON.parse(localStorage.getItem('biblia_v4_fav_list') || "[]");
+    
+    // Dividir por saltos de línea, comas o punto y coma
+    let entradas = input.value
+        .split(/[\n,;]+/)
+        .map(e => e.trim())
+        .filter(e => e.length > 0);
+
+    if (entradas.length === 0) return;
+
+    let agregados = 0;
+    let duplicados = 0;
+
+    entradas.forEach(entrada => {
+        // Comparación sin distinguir mayúsculas para evitar duplicados
+        let yaExiste = favs.some(f => f.trim().toLowerCase() === entrada.toLowerCase());
+        
+        if (!yaExiste) {
+            favs.push(entrada);
+            agregados++;
+        } else {
+            duplicados++;
+        }
+    });
+
+    localStorage.setItem('biblia_v4_fav_list', JSON.stringify(favs));
     input.value = "";
     renderizarPasajesFavoritos();
+
+    // Mensaje opcional de confirmación
+    if (agregados > 0 || duplicados > 0) {
+        let msg = "";
+        if (agregados > 0) msg += `Se agregaron ${agregados} versículo(s).`;
+        if (duplicados > 0) msg += (msg ? " " : "") + `${duplicados} ya existían.`;
+        if (msg) alert(msg);
+    }
 }
 function borrarVersiculoFavorito(idx) {
     let favs = JSON.parse(localStorage.getItem('biblia_v4_fav_list')||"[]");
