@@ -289,7 +289,7 @@ body {
             <div class="streak-card" style="margin-top: 15px;">
                 <div class="streak-title" style="color: #e74c3c;">⭐️ Pasajes Favoritos</div>
                 <div style="display: flex; gap: 6px; margin-bottom: 8px;">
-                    <textarea id="input-fav-versiculo" rows="3" style="flex-grow: 1; padding: 6px 8px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color); font-size: 0.82rem; resize: vertical; min-height: 60px; font-family: inherit;" placeholder="Un versículo por línea&#10;Ej:&#10;Romanos 8:28&#10;Juan 3:16 (mi nota)&#10;Salmos 23"></textarea>
+                    <textarea id="input-fav-versiculo" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="flex-grow: 1; padding: 6px 8px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color); font-size: 0.82rem; resize: none; min-height: 60px; font-family: inherit; overflow-y: hidden;" placeholder="Un versículo por línea&#10;Ej:&#10;Romanos 8:28&#10;Juan 3:16 (mi nota)&#10;Salmos 23"></textarea>
                     <button onclick="agregarVersiculoFavorito()" style="background: var(--primary); color: white; border: none; padding: 4px 10px; border-radius: 4px; font-size: 0.82rem; cursor: pointer; font-weight: bold;">＋</button>
                 </div>
                 <div id="lista-versiculos-favoritos" style="max-height: 200px; overflow-y: auto;"></div>
